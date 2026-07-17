@@ -25,13 +25,29 @@ mechanics, metrics captured).
 
 ## Metrics captured per fixture x condition
 
+Each fixture x condition cell runs 3 times (single runs of a nondeterministic process
+aren't data points); per-cell medians are reported with ranges.
+
 - **Judge rubric** — SOLID compliance, restraint (no gratuitous abstraction), contract
-  stability, scored by an LLM judge against a fixed rubric.
-- **Verification** — pinned tests still pass in the refactored copy.
+  stability, each scored 1-5 against written anchors by an LLM judge that is blind to
+  condition and runs 3x per artifact (median). No composite score — the axes pull in
+  opposite directions on purpose, so results are a per-axis profile.
+- **Verification** — pinned tests still pass in the refactored copy, with a guard that
+  the run didn't modify the tests themselves.
 - **Tokens** — input/output/cache tokens and USD cost, from the `claude -p --output-format
-  json` usage block.
-- **Time** — wall-clock duration of the run.
-- **Lines of code** — added/removed/net diff size vs. the original fixture.
+  json` usage block. Compared as totals (deployed cost, skill overhead included); the
+  cache-creation/cache-read split is not interpreted.
+- **Effort** — `num_turns` per run. Wall-clock duration is recorded but descriptive only
+  (it's dominated by API latency variance).
+- **Lines of code** — added/removed/net diff size vs. the original fixture. A behavioral
+  signature (did each skill push output in its characteristic direction), not a quality
+  score.
+- **Skill engagement** — whether the intended skill actually fired during the run
+  (solidifier is model-invoked, not always-on); runs where it didn't count toward a
+  trigger rate and are excluded from the quality comparison.
+
+Differences smaller than the judge's own run-to-run spread are reported as "no detectable
+difference" — a valid outcome, not a failure.
 
 ## Vision
 
@@ -41,11 +57,17 @@ comparison.
 
 ## Open questions
 
-- How large should the fixture corpus grow past the initial pilot, and from which repos?
-- Is CLI-flag-level isolation (`--safe-mode`, `--setting-sources`, `--plugin-dir`) durable
-  across Claude Code versions, or does it need re-verifying periodically?
-- Should the judge itself be run multiple times per fixture (self-consistency) given LLM
-  judges are noisy?
+- Which repos supply fixtures beyond the first candidates, and does the 10-15 fixture
+  target hold once the pilot's variance numbers are in?
+- Are 3 repetitions per cell enough, given the within-condition variance the pilot
+  measures?
+- How often does solidifier actually trigger on neutral task phrasing — and if the
+  trigger rate is low, is that a finding about the skill or a prompt-shaping problem?
+
+(Two earlier open questions are now settled in the design: judge self-consistency — the
+judge runs 3x per artifact with median scoring; and isolation durability across CLI
+versions — the preflight probe re-verifies flag behavior empirically after every
+upgrade instead of assuming it.)
 
 ## Current State
 
