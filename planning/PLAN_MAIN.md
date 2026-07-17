@@ -1,19 +1,19 @@
 ---
 type: reference
-tags: [repo/PROJECT_TEMPLATE]
-up: "[[PROJECT_TEMPLATE]]"
+tags: [repo/SkillBench]
+up: "[[SkillBench]]"
 ---
 # Planning
 
-The planning/ directory is intended for keeping track of project stages and the current state of the project. For each major stage or phase, create a PHASE_*.md in this directory that contains a detailed plan with notes and a checklist. PLAN_MAIN.md should contain references to those markdown files and brief summaries of what they contain. 
-
-
 ## Current State
 
-This section should be updated each time a checklist item is completed or major changes are made. Helpful for reorienting users when they revisit the project.
+Repo scaffolded from PROJECT_TEMPLATE. Phase 1 (harness + pilot fixture) in progress —
+see [[Repos/SkillBench/planning/PHASE_1|PHASE_1]] for the design: 4-condition comparison
+(baseline/solidifier/ponytail/both), CLI-flag-level isolation, and the metrics captured
+(judge rubric, pinned tests, tokens, time, LOC delta).
 
 ## Related
 
-- [[Repos/PROJECT_TEMPLATE/planning/PHASE_1|PHASE_1]]
-- [[Repos/PROJECT_TEMPLATE/planning/TODO|TODO]]
-- [[PROJECT_TEMPLATE]]
+- [[Repos/SkillBench/planning/PHASE_1|PHASE_1]]
+- [[Repos/SkillBench/planning/TODO|TODO]]
+- [[SkillBench]]

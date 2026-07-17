@@ -1,13 +1,21 @@
 ---
 type: reference
-tags: [repo/PROJECT_TEMPLATE]
-up: "[[PROJECT_TEMPLATE]]"
+tags: [repo/SkillBench]
+up: "[[SkillBench]]"
 ---
 # TODO
-TODO.md can optionally be folded into PLAN_MAIN.md. An easy to read checklist. Alternative/parallel way of tracking progress outside of PLAN_MAIN.md and phase files.
+
+## Phase 1 - Harness + pilot fixture
+
+- [ ] Fixture schema + one real pilot fixture
+- [ ] `harness/run.py` - condition orchestration + `claude -p` invocation
+- [ ] `harness/judge.py` - LLM rubric scoring
+- [ ] `harness/static_checks.py` - pinned tests + LOC delta
+- [ ] `harness/aggregate.py` - comparison table across the 4 conditions
+- [ ] Pilot fixture run end-to-end, all 4 conditions
 
 ## Related
 
-- [[Repos/PROJECT_TEMPLATE/planning/PLAN_MAIN|PLAN_MAIN]]
-- [[Repos/PROJECT_TEMPLATE/planning/PHASE_1|PHASE_1]]
-- [[PROJECT_TEMPLATE]]
+- [[Repos/SkillBench/planning/PLAN_MAIN|PLAN_MAIN]]
+- [[Repos/SkillBench/planning/PHASE_1|PHASE_1]]
+- [[SkillBench]]
