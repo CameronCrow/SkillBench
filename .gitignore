@@ -1,6 +1,12 @@
 # outputs
 out/
 
+# vendored plugins (pinned via .cache/vendor.json, which is also local)
+.cache/
+
+# benchmark run artifacts (transcripts, refactored copies, reports)
+results/
+
 # notes
 notes/
 
@@ -10,6 +16,10 @@ logs/
 
 # temporary files
 *.tmp
+
+# python
+__pycache__/
+*.pyc
 
 # Claude
 .claude/

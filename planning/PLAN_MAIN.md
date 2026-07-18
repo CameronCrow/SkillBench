@@ -7,7 +7,13 @@ up: "[[SkillBench]]"
 
 ## Current State
 
-Repo scaffolded from PROJECT_TEMPLATE. Phase 1 (harness + pilot fixture) in progress —
+Harness implemented in Python (stdlib only, 3.11+): `harness/{vendor,preflight,run,
+static_checks,judge,aggregate}.py` plus the pinned judge rubric (`harness/rubric.md`)
+and the fixture schema (`fixtures/README.md`). Smoke-tested on a synthetic fixture;
+not yet run against the live CLI. Remaining for Phase 1, on the desktop that has the
+plugins: vendor solidifier + ponytail (`python -m harness.vendor`), run preflight,
+create the pilot fixture, run the pilot end-to-end — see `docs/USER_MANUAL.md` for
+the exact steps. Phase 1 (harness + pilot fixture) in progress —
 see [[Repos/SkillBench/planning/PHASE_1|PHASE_1]] for the design: 4-condition comparison
 (baseline/solidifier/ponytail/both), symmetric isolation (identical flags every
 condition, only the `--plugin-dir` set varies, both plugins vendored at pinned versions),
