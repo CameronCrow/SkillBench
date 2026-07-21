@@ -39,7 +39,7 @@ def judge_one(fixture: Path, art: Path) -> dict:
     ])
     import os
     env = dict(os.environ, CLAUDE_CONFIG_DIR=str(ROOT / ".cache" / "scratch-config"))
-    with tempfile.TemporaryDirectory(prefix="sb_judge_") as td:
+    with tempfile.TemporaryDirectory(prefix="sb_judge_", ignore_cleanup_errors=True) as td:
         p = subprocess.run(
             [CLAUDE, "-p", "--output-format", "json", "--model", JUDGE_MODEL,
              "--setting-sources", "project,local", "--strict-mcp-config",

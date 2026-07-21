@@ -33,9 +33,11 @@ def unified_diff(before: Path, after: Path) -> str:
     import shutil
     import tempfile
 
-    with tempfile.TemporaryDirectory(prefix="sb_diff_") as td:
+    with tempfile.TemporaryDirectory(prefix="sb_diff_", ignore_cleanup_errors=True) as td:
         shutil.copytree(before, Path(td) / "a")
         shutil.copytree(after, Path(td) / "b")
+        for side in ("a", "b"):  # harness scaffolding, not part of the judged change
+            (Path(td) / side / "conftest.py").unlink(missing_ok=True)
         p = subprocess.run(
             ["git", "-c", "core.autocrlf=false", "diff", "--no-index", "--", "a", "b"],
             capture_output=True, text=True, cwd=td,

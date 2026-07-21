@@ -28,6 +28,8 @@ CONDITIONS: dict[str, list[str]] = {
     "baseline": [],
     "solidifier": [str(CACHE / "solidifier" / "claude-code" / "plugins" / "solidifier")],
     "ponytail": [str(CACHE / "ponytail")],
+    "both": [str(CACHE / "solidifier" / "claude-code" / "plugins" / "solidifier"),
+             str(CACHE / "ponytail")],
 }
 MODELS = {"sonnet": "claude-sonnet-5", "opus": "claude-opus-4-8"}
 COMMON_FLAGS = [
@@ -96,13 +98,17 @@ def run_claude(prompt: str, cwd: Path, model: str, condition: str, timeout: int 
     return {"result": result, "transcript": p.stdout}
 
 
-def detect_engagement(condition: str, transcript: str) -> bool | None:
-    """Did the intended skill actually fire? (None for baseline — nothing to fire.)"""
+def detect_engagement(condition: str, transcript: str):
+    """Did the intended skill(s) actually fire? (None for baseline — nothing to fire.)"""
+    # an explicit Skill tool invocation, not just the session-init listing naming it
+    solidifier = '"skill":"solidifier' in transcript
+    ponytail = "PONYTAIL" in transcript  # SessionStart hook banner injected into context
     if condition == "solidifier":
-        # the model invoking the skill shows up as a Skill/skill tool reference
-        return '"solidifier"' in transcript or "skills/solidifier" in transcript.lower()
+        return solidifier
     if condition == "ponytail":
-        return "PONYTAIL" in transcript  # SessionStart hook banner injected into context
+        return ponytail
+    if condition == "both":
+        return {"solidifier": solidifier, "ponytail": ponytail}
     return None
 
 
@@ -116,7 +122,9 @@ def preflight(condition: str) -> None:
     text = out["result"].get("result", "") + out["transcript"]
     lower = text.lower()
     assert LEAK_SENTINEL not in lower, f"[{condition}] user scope leaked into probe"
-    if condition == "solidifier":
+    if condition == "both":
+        assert "solidifier" in lower and "ponytail" in lower, "[both] a plugin not visible"
+    elif condition == "solidifier":
         assert "solidifier" in lower, "[solidifier] skill not visible"
         assert "ponytail" not in lower, "[solidifier] ponytail leaked in"
     elif condition == "ponytail":

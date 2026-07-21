@@ -47,7 +47,7 @@ def main() -> None:
             def score(cond, axis):
                 rid = f"{fx}_{cond}_{'sonnet' if 'sonnet' in model else 'opus'}"
                 return scores.get(rid, {}).get(axis, {}).get("score")
-            for cond in ("solidifier", "ponytail"):
+            for cond in ("solidifier", "ponytail", "both"):
                 dirs = []
                 for axis in AXES:
                     b, c = score("baseline", axis), score(cond, axis)
