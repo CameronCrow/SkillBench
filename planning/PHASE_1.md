@@ -37,6 +37,13 @@ Common flags for every condition: `--setting-sources project,local` (the scratch
 no project config, so this is effectively a clean context), `--strict-mcp-config` (no MCP
 servers), a pinned `--model`, `--dangerously-skip-permissions`.
 
+Every condition runs under **two pinned models — sonnet and opus** (revised 2026-07-20;
+model is a second grid axis, so a cell is fixture x condition x model). To keep total
+usage inside a subscription session window, the harness sums `total_cost_usd` across
+completed runs and stops launching new cells when a configured cost cap is reached,
+scheduling all Sonnet cells before any Opus cells so a budget stop degrades to fewer
+Opus fixtures rather than a half-run grid.
+
 An earlier draft used an asymmetric scheme — `--safe-mode` for baseline, default setting
 sources for the ponytail conditions (letting the live marketplace install load from user
 scope). Dropped, for three reasons, recorded here so it doesn't come back:
@@ -128,10 +135,12 @@ tainted (an agent making tests pass by editing them is a failure mode, not a pas
 
 ### Repetitions
 
-Each fixture x condition cell runs **3 times** — single runs of a nondeterministic
-process aren't data points. Report per-cell medians with ranges. The pilot's job includes
-measuring this within-condition variance, which is what tells us whether 3 is enough and
-how big the corpus needs to be.
+Each fixture x condition x model cell runs **once** (revised 2026-07-20, down from 3, to
+fit the usage budget). The known cost: no within-cell variance estimate, so a single
+anomalous run can't be distinguished from a real effect statistically — an
+implausible-looking cell gets a manual rerun and a note, not error bars. Results are
+therefore claims about *direction consistency across fixtures*, never about the size of
+any per-cell gap.
 
 ## Judge rubric (fixed, applied identically across all 4 conditions)
 
@@ -162,8 +171,11 @@ Judge mechanics:
   never the condition label and never the run transcript (the transcript names the active
   skill, which would unblind it). Blinding is imperfect — ponytail can leave `ponytail:`
   comments in output — noted as a limitation; artifacts are judged as-is, not edited.
-- **Run 3 times per artifact**, pinned judge model and version, median score per axis.
-  Cells where the three passes spread more than a point get flagged for human review.
+- **Run once per artifact** (revised 2026-07-20, down from 3, for the usage budget),
+  with a pinned Sonnet judge regardless of which model produced the artifact. Without
+  repeated passes there is no measured judge noise floor, so scores are treated as
+  ordinal per-fixture signals, not calibrated gaps; a score that looks off gets a manual
+  second pass and a note.
 - **Evidence required** — the judge must quote the specific code lines supporting each
   score, which makes scores auditable and discourages drive-by numbers.
 - **No composite score.** The axes intentionally pull in opposite directions (SOLID
@@ -177,22 +189,25 @@ Correctness is *not* judged qualitatively — it's the pinned-tests pass/fail si
 
 ## Reporting ties and noise
 
-A difference smaller than the judge's own run-to-run spread on that cell is reported as
-"no detectable difference" — that's a valid, publishable outcome of a comparison, not a
-failure of the benchmark. The aggregate table says it explicitly rather than letting a
-0.2-point gap masquerade as a result.
+With one rep and one judge pass there is no measured noise floor, so per-cell score gaps
+are never reported as results. The only reported comparison is direction: which condition
+scored higher on a given axis *on this fixture*, and whether that direction holds across
+fixtures and across both models. A mixed or flat direction is reported as "no consistent
+difference" — a valid outcome, not a failure of the benchmark.
 
 ## Pilot
 
 Before growing the fixture corpus, validate the full pipeline (preflight probes -> run ->
 judge -> static checks -> aggregate) end-to-end on a single real pilot fixture, all 4
-conditions x 3 repetitions. The pilot validates plumbing and measures variance; it
-supports **no conclusions about the skills** — one fixture generalizes to nothing, and
-any 4-way comparison drawn from it would be noise. Conclusions wait for the corpus:
-target 10-15 fixtures, analyzed as per-fixture paired comparisons (which condition scored
-higher *on this fixture*, and does the direction hold across fixtures) rather than pooled
-means — consistency of direction across a dozen paired fixtures is the strongest claim
-this corpus size can support.
+conditions x 2 models x 1 rep (8 runs + 8 judge calls). The pilot validates plumbing and
+gives the first real per-run cost numbers for calibrating the cost cap; it supports **no
+conclusions about the skills** — one fixture generalizes to nothing. The corpus is capped
+at **3 fixtures total** (revised 2026-07-20, down from 10-15, for the usage budget:
+~24 refactor runs + ~24 judge calls ≈ $12-15 cost-equivalent, Opus cells dominating),
+analyzed as per-fixture paired comparisons. Three fixtures support only weak
+direction-consistency claims — that's the accepted trade for fitting the whole grid into
+a fraction of one session window; more fixtures can be added later fixture-by-fixture if
+the direction looks interesting.
 
 ## Related
 
