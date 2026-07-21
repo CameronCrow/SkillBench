@@ -29,3 +29,10 @@ graphify-out/.commits_since_update
 graphify-out/.needs_update
 graphify-out/.hook_update.log
 graphify-out/20*/
+
+# benchmark plugin vendoring (pinned versions, see planning/PHASE_1.md)
+.cache/
+
+# benchmark outputs: keep the jsonl records, not per-run after-trees/transcripts
+results/artifacts/
+__pycache__/

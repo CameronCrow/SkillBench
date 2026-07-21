@@ -33,6 +33,10 @@ everything else is held constant:
 | ponytail only | `--plugin-dir .cache/ponytail` |
 | both | both `--plugin-dir` flags |
 
+The 2026-07-20 run covers the first three conditions only (baseline / solidifier /
+ponytail — per Cameron's goal directive); "both" stays in the design and can be added as
+another `CONDITIONS` entry when wanted.
+
 Common flags for every condition: `--setting-sources project,local` (the scratch dir has
 no project config, so this is effectively a clean context), `--strict-mcp-config` (no MCP
 servers), a pinned `--model`, `--dangerously-skip-permissions`.
@@ -96,6 +100,16 @@ leak through `--setting-sources`, the fallback is pointing `CLAUDE_CONFIG_DIR` a
 scratch config dir. The probe is cheap and re-runs after every CLI upgrade, which is also
 the durability answer: flag semantics aren't assumed stable across versions, they're
 re-verified.
+
+What the probes found on CLI 2.1.216 (2026-07-20): `--setting-sources project,local`
+alone still loads user-scope skills and the global `~/.claude/CLAUDE.md`. The scratch
+`CLAUDE_CONFIG_DIR` fallback (credentials copied in, else "Not logged in") removes user
+skills/settings/plugins — but the global CLAUDE.md is read from the home directory
+unconditionally (HOME/USERPROFILE overrides are ignored, and `--bare` is unusable: it
+disables OAuth and hooks, which would kill both subscription auth and ponytail's
+SessionStart mechanism). So the harness additionally renames `~/.claude/CLAUDE.md`
+aside for the duration of each invocation, restores it in `finally`, and self-heals on
+startup if a crash left it sidelined. With all three measures the probes pass cleanly.
 
 ## Invocation + metrics capture
 
